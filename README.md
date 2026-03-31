@@ -1,6 +1,7 @@
 # Catopus_Monopoly_for_Dialogic_Science_Learning
 
 「学术游园会」是一款专为课堂教学、学术沙龙设计的网页互动游戏。它将“大富翁”的经典玩法与“学术对话”深度结合，旨在通过角色扮演、线索收集和逻辑对话，让参与者在轻松的氛围中完成知识的内化与应用。
+
 This project is an interactive web-based game designed specifically for collective learning. It integrates the classic gameplay of "Monopoly" with the dynamics of "academic dialogue," aiming to facilitate the internalization and application of knowledge among participants—within a relaxed atmosphere—through role-playing, clue gathering, and reasoned dialogue.
 
 ---
