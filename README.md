@@ -6,7 +6,7 @@ This project is an interactive web-based game designed specifically for collecti
 
 ---
 
-## ✨ 核心特色
+## ✨ 核心特色（Highlights）
 * **🧠 知识论证系统：** 该游戏需要玩家通过「现象」、「理论」、「实验」三位一体的卡牌组合进行逻辑推理、验证。
 * **The Argumentation System:** The game requires players to engage in logical reasoning and argumentation by utilizing a tripartite combination of cards: "Phenomena," "Theories," and "Experiments".
 * **⚔️ 多元对话策略：** 提供「知识链接」、「极限挑刺」、「灵魂拷问」、「现象拆解」四种踢馆模式，深度锻炼批判性思维。
@@ -16,14 +16,14 @@ This project is an interactive web-based game designed specifically for collecti
 
 ---
 
-## 🚀 快速开始
+## 🚀 快速开始（How to Start）
 
 ### 1. 运行环境（Environment）
 直接使用浏览器（推荐 Chrome, Edge 或 Safari）打开网页 `[nunuzh.github.io/Catopus_Monopoly_for_Science_Learning/]` 即可，无需安装任何环境。
 
 Open the webpage [nunuzh.github.io/Catopus_Monopoly_for_Dialogic_Science_Learning/] in your browser (Chrome, Edge, or Safari recommended). No local environment or installation is required.
 
-### 2. 准备工作
+### 2. 准备工作（Preparation）
 * **人数：** 建议 2 - 6 组参与。
 * **Group Size:** 2 - 6 groups/players are recommended.
 * **设备：** 建议连接大屏幕或投影仪进行展示，由一名主持人（老师）操作界面。
