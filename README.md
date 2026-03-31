@@ -19,9 +19,9 @@ This project is an interactive web-based game designed specifically for collecti
 ## 🚀 快速开始
 
 ### 1. 运行环境（Environment）
-直接使用浏览器（推荐 Chrome, Edge 或 Safari）打开网页 `[https://nunuzh.github.io/Catopus_Monopoly_for_Science_Learning/]` 即可，无需安装任何环境。
+直接使用浏览器（推荐 Chrome, Edge 或 Safari）打开网页 `[nunuzh.github.io/Catopus_Monopoly_for_Science_Learning/]` 即可，无需安装任何环境。
 
-Open the webpage [https://nunuzh.github.io/Catopus_Monopoly_for_Dialogic_Science_Learning/] in your browser (Chrome, Edge, or Safari recommended). No local environment or installation is required.
+Open the webpage [nunuzh.github.io/Catopus_Monopoly_for_Dialogic_Science_Learning/] in your browser (Chrome, Edge, or Safari recommended). No local environment or installation is required.
 
 ### 2. 准备工作
 * **人数：** 建议 2 - 6 组参与。
