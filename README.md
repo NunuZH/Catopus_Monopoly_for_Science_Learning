@@ -20,6 +20,7 @@ This project is an interactive web-based game designed specifically for collecti
 
 ### 1. 运行环境（Environment）
 直接使用浏览器（推荐 Chrome, Edge 或 Safari）打开网页 `https://nunuzh.github.io/Catopus_Monopoly_for_Science_Learning/` 即可，无需安装任何环境。
+
 Open the webpage https://nunuzh.github.io/Catopus_Monopoly_for_Science_Learning/ in your browser (Chrome, Edge, or Safari recommended). No local environment or installation is required.
 
 ### 2. 准备工作
@@ -43,14 +44,17 @@ Open the webpage https://nunuzh.github.io/Catopus_Monopoly_for_Science_Learning/
 
 ### 阶段一：探索发掘（Discovery）
 玩家通过掷骰子落在「探索」格子，选择方向（现象/理论/实验）并抽取卡牌。若回答正确/论述合理，可将卡牌收入背包，且该地块会揭晓为「空地」或「评议」。
+
 Players move by rolling dice; if they land on an "Exploration" tile, they choose a category (Phenomenon/Theory/Experiment) and pick a card. If the answer is correct or the explanation is logical/well-reasoned, the player adds the card to their inventory. Once a card is collected, the tile reveals its true nature as either a "Land" or "Peer Review".
 
 ### 阶段二：论证占地（Argumentation）
 落在「空地」时，玩家需使用手中至少两张卡牌进行逻辑串联（如：用某个实验验证某个理论）。老师和其他同学判断论证成功后，该玩家成为该地的「领主」。
+
 When landing on a "Land" tile, players must use at least two cards from their inventory to create a logical/reasoned connection (e.g., using a specific experiment to verify a theory). Once the teacher and peers validate the argument, the player becomes the "Lord" of that tile.
 
 ### 阶段三：踢馆与巩固（Challenge）
 当其他玩家落在已有领主的土地时，需缴纳“积分路费”，并可发起「踢馆」：
+
 When a player lands on a tile already owned by a Lord, they must pay a "Point Toll" and may initiate a "Challenge":
 * **挑战者：** 选择一种策略与领主的卡牌进行互动。
 * **Challenger:** Selects a specific strategy (from "Coordination", "Challenge", "Inquiry", "Refer to Wider Context") to interact with the Lord's card(s).
@@ -72,4 +76,5 @@ When a player lands on a tile already owned by a Lord, they must pay a "Point To
 
 ## 🎨 鸣谢与致谢 (Credits)
 本项目的视觉表现力离不开视觉与角色设计创作者高蜻禅（Dido）的倾力支持！感谢她为「学术游园会」注入的独特灵魂。
+
 The visual impact of this project owes everything to the wholehearted support of its visual and character designer, Gao Qingchan (Dido)! A big thank you to her for infusing this project with its unique soul.
