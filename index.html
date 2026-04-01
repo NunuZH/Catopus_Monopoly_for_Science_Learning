@@ -1,5 +1,55 @@
-<h1>项目链接View Project</h1>
-<ul>
-    <li><a href="./Main_Project/index.html">【Monopoly_for_Dialogic_Science_Learning】</a></li>
-    <li><a href="./Psychological_Health_Project/index.html">【待上传】</a></li>
-</ul>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>项目卷轴 View Project</title>
+<style>
+  
+  body { background-color: #fdfaf5; background-image: url('https://www.transparenttextures.com/patterns/parchment.png'); font-family: "Noto Serif SC", "Source Han Serif SC", "SimSun", "STSong", serif; margin: 0; padding: 20px; color: #333; }
+  .project-container { max-width: 700px; margin: 50px auto; padding: 40px; background: #fff; border: 2px solid #a61b29; box-shadow: 0 10px 25px rgba(166, 27, 41, 0.1); position: relative; }
+  .project-container::before, .project-container::after { content: ""; position: absolute; width: 30px; height: 30px; border: 3px solid #a61b29; }
+  .project-container::before { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+  .project-container::after { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+  h1 { color: #a61b29; text-align: center; font-size: 28px; font-weight: 700; margin-bottom: 40px; position: relative;  display: flex; align-items: center; justify-content: center; }
+  
+  h1::before, h1::after { content: "~~~"; font-family: cursive; margin: 0 15px; opacity: 0.5; }
+
+  .project-list { list-style: none; padding: 0;}
+  .project-item { background: #fff; border: 1px solid #e0e0e0; margin-bottom: 20px; position: relative; transition: all 0.3s ease; }
+  .project-item:hover { border-color: #a61b29; transform: translateX(5px); background-color: #fdfaf5; }
+  .project-link { display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; text-decoration: none;color: #222; font-size: 18px; transition: color 0.3s ease; }
+  .project-item:hover .project-link { color: #a61b29;}
+  .status-dot { width: 10px; height: 10px; background-color: #a61b29; border-radius: 50%; margin-right: 15px; }
+
+  .pending .status-dot { background-color: #bbb; }
+  .pending .project-link { color: #999; cursor: not-allowed;}
+
+</style>
+</head>
+<body>
+
+<div class="project-container">
+  <h1>项目链接 View Project</h1>
+  
+  <ul class="project-list">
+    <li class="project-item">
+      <a href="./Main_Project/index.html" class="project-link">
+        <div style="display: flex; align-items: center;">
+          <span class="status-dot"></span> Monopoly for Dialogic Science Learning
+        </div>
+      </a>
+    </li>
+    
+    <li class="project-item pending">
+      <div class="project-link">
+        <div style="display: flex; align-items: center;">
+          <span class="status-dot"></span> Psychological Health Project (Coming Soon)
+        </div>
+      </div>
+    </li>
+  </ul>
+</div>
+
+</body>
+</html>
