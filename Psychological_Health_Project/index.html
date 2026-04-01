@@ -338,12 +338,12 @@
 <script>
     // 人物图鉴  //
     const characters = [
-        { id: 'c1', name: '孙岫云', img: 'Images/孙岫云.png', desc: '【特权】占领空地时，大胆的脑洞或富有创意的假设，可获额外股份。' },
-        { id: 'c2', name: '李晞棠', img: 'Images/李晞棠.png', desc: '【特权】占领空地时，流畅精准或浪漫诗意的表达，可获额外股份。' },
-        { id: 'c3', name: '章鱼猫', img: 'Images/章鱼猫.png', desc: '【特权】踢馆时，若选择“卡片链接”策略，可以使用场上已被发现的任何卡牌。' },
-        { id: 'c4', name: '钱澈', img: 'Images/钱澈.png', desc: '【特权】踢馆时，若选择“知识问答”策略，可以使用场上已被发现的任何卡牌。' },
-        { id: 'c5', name: '温既明', img: 'Images/温既明.png', desc: '【特权】踢馆时，若选择“发言回顾”策略并成功，可获额外股份。' },
-        { id: 'c6', name: '卡尔', img: 'Images/卡尔.png', desc: '【特权】踢馆时，若选择“经历分享”策略并成功，可获额外股份。' },
+        { id: 'c1', name: '孙岫云', img: '../Images/孙岫云.png', desc: '【特权】占领空地时，大胆的脑洞或富有创意的假设，可获额外股份。' },
+        { id: 'c2', name: '李晞棠', img: '../Images/李晞棠.png', desc: '【特权】占领空地时，流畅精准或浪漫诗意的表达，可获额外股份。' },
+        { id: 'c3', name: '章鱼猫', img: '../Images/章鱼猫.png', desc: '【特权】踢馆时，若选择“卡片链接”策略，可以使用场上已被发现的任何卡牌。' },
+        { id: 'c4', name: '钱澈', img: '../Images/钱澈.png', desc: '【特权】踢馆时，若选择“知识问答”策略，可以使用场上已被发现的任何卡牌。' },
+        { id: 'c5', name: '温既明', img: '../Images/温既明.png', desc: '【特权】踢馆时，若选择“发言回顾”策略并成功，可获额外股份。' },
+        { id: 'c6', name: '卡尔', img: '../Images/卡尔.png', desc: '【特权】踢馆时，若选择“经历分享”策略并成功，可获额外股份。' },
         
     ];
     //换行用<br>
@@ -355,16 +355,16 @@
     let isSfxOn = true;
 
     // 1. 背景音乐设置 (循环播放)
-    const bgMusic = new Audio('Audio/bg.mp3');
+    const bgMusic = new Audio('../Audio/bg.mp3');
     bgMusic.loop = true;
 
     // 2. 音效库
     const sfx = {
-        click: new Audio('Audio/click.mp3'),
-        dice: new Audio('Audio/dice.mp3'),
-        scoreup: new Audio('Audio/scoreup.mp3'),
-        cheer: new Audio('Audio/cheer.mp3'),
-        exchange: new Audio('Audio/exchange.mp3')
+        click: new Audio('../Audio/click.mp3'),
+        dice: new Audio('../Audio/dice.mp3'),
+        scoreup: new Audio('../Audio/scoreup.mp3'),
+        cheer: new Audio('../Audio/cheer.mp3'),
+        exchange: new Audio('../Audio/exchange.mp3')
     };
 
     // 播放音效的通用函数
