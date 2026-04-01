@@ -59,7 +59,7 @@ When a player lands on a tile already owned by a Lord, they must pay a "Point To
 * **挑战者：** 选择一种策略与领主的卡牌进行互动。
 * **Challenger:** Selects a specific strategy (from "Coordination", "Challenge", "Inquiry", "Refer to Wider Context") to interact with the Lord's card(s).
 * **领主：** 进行防守或反驳。
-* **Lord:** Defends their ownership of than land by initiating new arguments or provides a counter-argument.
+* **Lord:** Defends their ownership of the land by initiating new arguments or provides a counter-argument.
 * **裁判：** 由全场或老师裁定，胜者获得该地块的股份，股份多者成为新领主。
 * **Judgment:** The entire class or the teacher acts as the judge. The winner gains shares of that tile, and the player with the most shares becomes the new Lord.
 
