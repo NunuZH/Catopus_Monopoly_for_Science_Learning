@@ -65,7 +65,7 @@ When a player lands on a tile already owned by a Lord, they must pay a "Point To
 
 ### 阶段四：最终结算（Victory）
 * **胜负标准：** 最终获胜者由总分决定，而非占领土地的数量。
-* **Victory Condition**:** The winner is determined by the Total Score, not the number of tiles owned.
+* **Victory Condition:** The winner is determined by the Total Score, not the number of tiles owned.
 * **股份的功能：** 拥有“股份”可以让你成为领主并控制地块，但股份本身不计入最终胜分。
 * **Role of Shares:** Shares allow you to become a "Lord" and control tiles, but they do not count as final victory points.
 * **领地收益：** 成为领主的主要优势是向路过的其他小组收取“积分路费”，从而增加你的总分。
