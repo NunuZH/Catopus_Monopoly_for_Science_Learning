@@ -368,12 +368,12 @@
 <script>
     // 人物图鉴  //
     const characters = [
-        { id: 'c1', name: '孙岫云', img: 'Images/孙岫云.png', desc: '【特权】游戏任意阶段提出有效问题，可获得 1 分。<br>【特权】占领空地时，大胆的脑洞或富有创意的假设，可获额外股份。' },
-        { id: 'c2', name: '李晞棠', img: 'Images/李晞棠.png', desc: '【特权】游戏任意阶段提出有效问题，可获得 1 分。<br>【特权】占领空地时，流畅精准或浪漫诗意的表达，可获额外股份。' },
-        { id: 'c3', name: '钱澈', img: 'Images/钱澈.png', desc: '【特权】游戏任意阶段使用数学推理发言成功，可获得 1 分。<br>【特权】踢馆时，若选择“知识链接”策略，可以使用场上已被发现的任何卡牌。' },
-        { id: 'c4', name: '温既明', img: 'Images/温既明.png', desc: '【特权】游戏任意阶段阐述科学法则相关的哲学思考，可获得 1 分<br>【特权】踢馆时，选择“灵魂拷问”策略并成功时，可获额外股份。' },
-        { id: 'c5', name: '卡尔', img: 'Images/卡尔.png', desc: '【特权】探索阶段时，即使回答错误，也能获得卡牌。<br>【特权】踢馆时，选择“极限挑刺”策略并成功时，可获额外股份。' },
-        { id: 'c6', name: '章鱼猫', img: 'Images/章鱼猫.png', desc: '【特权】同行评议阶段，只要参与发言就能获得 1 分。<br>【特权】踢馆时，选择“现象拆解”策略并成功时，可获额外股份。' }
+        { id: 'c1', name: '孙岫云', img: '../Images/孙岫云.png', desc: '【特权】游戏任意阶段提出有效问题，可获得 1 分。<br>【特权】占领空地时，大胆的脑洞或富有创意的假设，可获额外股份。' },
+        { id: 'c2', name: '李晞棠', img: '../Images/李晞棠.png', desc: '【特权】游戏任意阶段提出有效问题，可获得 1 分。<br>【特权】占领空地时，流畅精准或浪漫诗意的表达，可获额外股份。' },
+        { id: 'c3', name: '钱澈', img: '../Images/钱澈.png', desc: '【特权】游戏任意阶段使用数学推理发言成功，可获得 1 分。<br>【特权】踢馆时，若选择“知识链接”策略，可以使用场上已被发现的任何卡牌。' },
+        { id: 'c4', name: '温既明', img: '../Images/温既明.png', desc: '【特权】游戏任意阶段阐述科学法则相关的哲学思考，可获得 1 分<br>【特权】踢馆时，选择“灵魂拷问”策略并成功时，可获额外股份。' },
+        { id: 'c5', name: '卡尔', img: '../Images/卡尔.png', desc: '【特权】探索阶段时，即使回答错误，也能获得卡牌。<br>【特权】踢馆时，选择“极限挑刺”策略并成功时，可获额外股份。' },
+        { id: 'c6', name: '章鱼猫', img: '../Images/章鱼猫.png', desc: '【特权】同行评议阶段，只要参与发言就能获得 1 分。<br>【特权】踢馆时，选择“现象拆解”策略并成功时，可获额外股份。' }
     ];
     //换行用<br>
     let currentSelectingIndex = 0; // 当前正在选人的队伍索引
@@ -389,11 +389,11 @@
 
     // 2. 音效库
     const sfx = {
-        click: new Audio('Audio/click.mp3'),
-        dice: new Audio('Audio/dice.mp3'),
-        scoreup: new Audio('Audio/scoreup.mp3'),
-        cheer: new Audio('Audio/cheer.mp3'),
-        exchange: new Audio('Audio/exchange.mp3')
+        click: new Audio('../Audio/click.mp3'),
+        dice: new Audio('../Audio/dice.mp3'),
+        scoreup: new Audio('../Audio/scoreup.mp3'),
+        cheer: new Audio('../Audio/cheer.mp3'),
+        exchange: new Audio('../Audio/exchange.mp3')
     };
 
     // 播放音效的通用函数
