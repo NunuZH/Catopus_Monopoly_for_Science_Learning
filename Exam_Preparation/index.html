@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>考前游园会 - 策略对抗版 (含音效)</title>
+    <style>
+        :root {
+            --paper: #f2eada;
+            --ink: #2b2b2b;
+            --vermilion: #8c2727;
+            --jade: #3d5a45;
+            --ochre: #b58235;
+            --blue: #3c5a82;
+        }
+        body {
+            background-color: var(--paper);
+            background-image: url('https://www.transparenttextures.com/patterns/rice-paper-2.png');
+            color: var(--ink);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: "Microsoft YaHei", serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        .header {
+            position: relative; /* 为音效按钮定位做准备 */
+            border-bottom: 3px double var(--ink);
+            width: 100%;
+            padding: 15px;
+            text-align: center;
+            font-size: 36px;
+            letter-spacing: 8px;
+            font-weight: bold;
+            background: rgba(255,255,255,0.4);
+            box-sizing: border-box;
+        }
+        
+        /* 音频控制按钮样式 */
+        .audio-controls {
+            position: absolute; 
+            top: 15px; 
+            right: 20px; 
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+        }
+        .audio-controls button {
+            font-size: 14px; 
+            padding: 5px 10px;
+        }
+
+        /* --- 主舞台布局 --- */
+        #main-stage { display: flex; gap: 40px; padding: 20px; max-width: 1400px; width: 100%; justify-content: center; }
+        .left-section { display: flex; flex-direction: column; align-items: center; }
+        
+        /* 地图样式 */
+        #board {
+            display: grid;
+            grid-template-columns: repeat(5, 120px);
+            grid-template-rows: repeat(5, 120px);
+            gap: 12px;
+            padding: 15px;
+            background: rgba(0,0,0,0.02);
+            border: 2px solid var(--ink);
+            position: relative;
+        }
+        .cell {
+            background: rgba(255,255,255,0.8);
+            border: 1px solid var(--ink);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .cell.active { transform: scale(1.1); box-shadow: 0 0 15px var(--vermilion); z-index: 10; outline: 4px solid var(--vermilion); }
+        .cell-icon { font-size: 36px; margin-bottom: 5px; opacity: 0.8; }
+        .owner-banner { position: absolute; bottom: 0; width: 100%; color: white; font-size: 12px; padding: 4px 0; font-weight: bold; text-align: center; }
+
+        /* 积分榜样式 */
+        #score-panel { width: 360px; background: rgba(255,255,255,0.7); border: 2px solid var(--ink); padding: 15px; box-shadow: 5px 5px 0 rgba(0,0,0,0.1); }
+        .score-item { margin-bottom: 12px; padding: 12px; border: 1px solid #ccc; background: white; transition: 0.3s; }
+        .score-item.active-player { transform: scale(1.03); box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .bag-title { font-size: 13px; color: #666; margin-top: 8px; border-top: 1px dashed #eee; padding-top: 8px; }
+        .inv-tag { display: inline-block; padding: 4px 8px; margin: 3px; background: var(--jade); color: white; font-size: 12px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1); }
+
+        /* 骰子区域 */
+        .dice-area { display: flex; align-items: center; justify-content: center; gap: 30px; margin-top: 20px; background: #fff; padding: 15px 30px; border: 2px solid var(--ink); width: 100%; box-sizing: border-box;}
+        #dice { width: 60px; height: 60px; position: relative; transform-style: preserve-3d; transition: transform 1s; cursor: pointer; }
+        .dice-face { position: absolute; width: 60px; height: 60px; background: white; border: 2px solid var(--ink); line-height: 60px; text-align: center; font-size: 28px; font-weight: bold; color: var(--vermilion); }
+        .front { transform: rotateY(0deg) translateZ(30px); }
+        .back { transform: rotateY(180deg) translateZ(30px); }
+        .right { transform: rotateY(90deg) translateZ(30px); }
+        .left { transform: rotateY(-90deg) translateZ(30px); }
+        .top { transform: rotateX(90deg) translateZ(30px); }
+        .bottom { transform: rotateX(-90deg) translateZ(30px); }
+
+        /* 弹窗及按钮样式 */
+        .btn-retro { background: var(--paper); border: 2px solid var(--ink); color: var(--ink); padding: 10px 20px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 16px; }
+        .btn-retro:hover { background: var(--ink); color: var(--paper); }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; border: 3px solid var(--ink); padding: 30px; max-width: 800px; width: 90%; text-align: center; }
+        textarea { width: 100%; height: 100px; margin-top: 20px; padding: 10px; font-size: 18px; border: 2px solid var(--ink); box-sizing: border-box; font-family: inherit;}
+        
+        /* 策略按钮 */
+        .strategy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
+        .btn-strategy { padding: 15px; border: 2px solid var(--ink); background: #f9f9f9; color: var(--ink); cursor: pointer; font-weight: bold; font-size: 18px; transition: 0.2s;}
+        .btn-strategy:hover { border-color: var(--vermilion); }
+        .btn-strategy small { display: block; font-weight: normal; font-size: 13px; margin-top: 6px; color: inherit; opacity: 0.8;}
+
+        /* 双方口袋对比 */
+        .pocket-compare { display: flex; gap: 15px; margin-bottom: 20px; }
+        .pocket-box { flex: 1; padding: 15px; border: 2px dashed #ccc; background: #fafafa; text-align: left; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    🎋 考前游园会 🎋
+    <div class="audio-controls">
+        <button id="btn-music" class="btn-retro" onclick="toggleMusic()">🎵 音乐：开</button>
+        <button id="btn-sfx" class="btn-retro" onclick="toggleSfx()">🔊 音效：开</button>
+    </div>
+</div>
+
+<div id="setup" style="margin-top: 50px; text-align: center; background: white; padding: 40px; border: 3px solid var(--ink);">
+    <h2 style="color:var(--vermilion);">请配置小组数量</h2>
+    <input type="number" id="player-num" value="4" min="2" max="6" style="font-size: 24px; width: 80px; text-align: center;">
+    <br><br>
+    <button class="btn-retro" onclick="initGame()" style="font-size: 20px; padding: 15px 40px;">正式入园</button>
+</div>
+
+<div id="main-stage" style="display:none;">
+    <div class="left-section">
+        <div id="board"></div>
+        <div class="dice-area">
+            <h3 id="dice-status" style="margin:0; font-size:24px;">等待出发...</h3>
+            <div id="dice" onclick="rollDice()">
+                <div class="dice-face front">1</div><div class="dice-face back">6</div>
+                <div class="dice-face right">3</div><div class="dice-face left">4</div>
+                <div class="dice-face top">2</div><div class="dice-face bottom">5</div>
+            </div>
+            <p style="margin:0; color:#666; font-size:14px;">(点击骰子)</p>
+        </div>
+    </div>
+    
+    <div id="score-panel">
+        <h3 style="border-bottom: 2px solid var(--ink); text-align: center; margin-top:0; padding-bottom: 10px;">📊 积分与锦囊</h3>
+        <div id="player-list"></div>
+    </div>
+</div>
+
+<div id="synthesis-modal" class="modal">
+    <div class="modal-content">
+        <h2 style="color: var(--jade); font-size: 32px; margin-top:0;">⚖️ 生成经验锦囊</h2>
+        <p style="font-size: 18px;">请选择主题，并输入你们组的干货心得：</p>
+        <div style="display:flex; gap:15px; justify-content:center; margin-top: 15px;">
+            <button class="btn-retro btn-theme" onclick="selectTheme('🌿 身心放松', this)">🌿 身心放松</button>
+            <button class="btn-retro btn-theme" onclick="selectTheme('📈 高效复习', this)">📈 高效复习</button>
+            <button class="btn-retro btn-theme" onclick="selectTheme('🛡️ 考场应对', this)">🛡️ 考场应对</button>
+        </div>
+        <textarea id="user-input" placeholder="输入核心关键词（例如：三深呼吸法、快速排雷技巧）..."></textarea>
+        <div style="margin-top: 20px; background: #fffcf5; border: 1px dashed #ccc; padding: 10px;">
+            <label style="cursor:pointer; font-weight:bold; color:var(--vermilion);"><input type="checkbox" id="syn-priv" style="width:16px;height:16px;"> 🌟 判定结果：表现优异 (额外 +1 股)</label>
+        </div>
+        <div style="margin-top:25px;">
+            <button class="btn-retro" style="background:var(--jade); color:white; font-size:20px; padding: 12px 30px; margin-right: 15px;" onclick="confirmSynthesis()">确认封地</button>
+            <button class="btn-retro" style="font-size:18px;" onclick="closeModal('synthesis-modal')">取消 / 跳过</button>
+        </div>
+    </div>
+</div>
+
+<div id="challenge-modal" class="modal">
+    <div class="modal-content" style="max-width: 900px;">
+        <h2 style="color:var(--vermilion); font-size: 36px; margin-top:0;">⚔️ 策略对抗</h2>
+        
+        <div class="pocket-compare">
+            <div class="pocket-box" id="challenger-pocket"></div>
+            <div style="display:flex; align-items:center; font-weight:900; font-size:28px; color:#aaa;">VS</div>
+            <div class="pocket-box" id="owner-pocket"></div>
+        </div>
+
+        <div id="challenge-info" style="text-align:left; background:#fff; padding:15px; border:2px solid var(--ink); margin-bottom:20px;"></div>
+
+        <h3 style="margin-bottom: 10px; font-size: 20px;">请挑战者选择突破策略：</h3>
+        <div class="strategy-grid">
+            <div class="btn-strategy" onclick="selectStrategy('🔗 卡片链接', this)">🔗 卡片链接<small>结合双方拥有的锦囊，产生新联结</small></div>
+            <div class="btn-strategy" onclick="selectStrategy('🧩 经历分享', this)">🧩 经历分享<small>用真实故事强化/削弱领主的观点</small></div>
+            <div class="btn-strategy" onclick="selectStrategy('🔍 发言回顾', this)">🔍 发言回顾<small>引用领主组内之前的精彩或矛盾点</small></div>
+            <div class="btn-strategy" onclick="selectStrategy('🔥 逻辑质询', this)">🔥 逻辑质询<small>直击痛点，针对该心得提出硬核质疑</small></div>
+        </div>
+
+        <div style="background:#fffcf5; padding:10px; border:1px dashed var(--vermilion); margin-bottom:20px;">
+            <label style="cursor:pointer; font-weight:bold; color:var(--vermilion);"><input type="checkbox" id="chal-priv" style="width:16px;height:16px;"> 🌟 判定结果：表现惊艳 / 质询成功 (额外 +1 股)</label>
+        </div>
+
+        <button class="btn-retro" style="background:var(--jade); color:white; font-size: 22px; padding: 12px 30px; margin-right: 15px;" onclick="handleChallenge(true)">🟢 判定结果：成功 (+1 股)</button>
+        <button class="btn-retro" style="background:var(--vermilion); color:white; font-size: 20px; padding: 12px 30px;" onclick="handleChallenge(false)">🔴 判定结果：失败 (回合结束)</button>
+    </div>
+</div>
+
+<script>
+    // =====================================
+    // 🎵 音频管理系统
+    // =====================================
+    let isMusicOn = true;
+    let isSfxOn = true;
+
+    // 背景音乐
+    const bgMusic = new Audio('../Audio/bg.mp3');
+    bgMusic.loop = true;
+
+    // 音效库
+    const sfx = {
+        click: new Audio('../Audio/click.mp3'),
+        dice: new Audio('../Audio/dice.mp3'),
+        scoreup: new Audio('../Audio/scoreup.mp3'),
+        cheer: new Audio('../Audio/cheer.mp3'),
+        exchange: new Audio('../Audio/exchange.mp3')
+    };
+
+    function playSfx(name) {
+        if (isSfxOn && sfx[name]) {
+            sfx[name].currentTime = 0; 
+            sfx[name].play().catch(e => console.log("音效播放拦截:", e)); 
+        }
+    }
+
+    function toggleMusic() {
+        isMusicOn = !isMusicOn;
+        if (isMusicOn) bgMusic.play().catch(e=>{});
+        else bgMusic.pause();
+        document.getElementById('btn-music').innerText = isMusicOn ? "🎵 音乐：开" : "🎵 音乐：关";
+    }
+
+    function toggleSfx() {
+        isSfxOn = !isSfxOn;
+        document.getElementById('btn-sfx').innerText = isSfxOn ? "🔊 音效：开" : "🔇 音效：关";
+    }
+
+    // 全局点击音效
+    document.addEventListener('click', function(e) {
+        // 防止点音效控制按钮时重复发声
+        if(e.target.id !== 'btn-music' && e.target.id !== 'btn-sfx'){
+            playSfx('click');
+        }
+    });
+
+    // =====================================
+    // 🎲 游戏核心逻辑
+    // =====================================
+    const mapOrder = [0,1,2,3,4, 9,14,19,24, 23,22,21,20, 15,10,5];
+    let players = [], activePlayerIndex = 0, currentPos = 0;
+    let landShares = {}; 
+    let selectedTheme = "";
+    let selectedStrategy = "";
+
+    const colors = [
+        { main: '#8c2727', light: '#fdecec' }, 
+        { main: '#3d5a45', light: '#ecfdf1' }, 
+        { main: '#3c5a82', light: '#ecf5fd' }, 
+        { main: '#b58235', light: '#fdf9ec' }, 
+        { main: '#6b4226', light: '#fdf5ec' }, 
+        { main: '#4b0082', light: '#f7ecfd' }  
+    ];
+
+    function initGame() {
+        if(isMusicOn) bgMusic.play().catch(e=>{}); 
+
+        const num = document.getElementById('player-num').value;
+        for(let i=0; i<num; i++) {
+            players.push({
+                id: i, name: `第${i+1}组`, color: colors[i], score: 0, inventory: []
+            });
+        }
+        document.getElementById('setup').style.display = 'none';
+        document.getElementById('main-stage').style.display = 'flex';
+        renderBoard();
+        updateUI();
+    }
+
+    let isRolling = false;
+    function rollDice() {
+        if(isRolling) return;
+        isRolling = true;
+        playSfx('dice');
+
+        const dice = document.getElementById('dice');
+        const num = Math.floor(Math.random() * 6) + 1;
+        const rotations = [[0,0], [-90,0], [0,-90], [0,90], [90,0], [0,180]];
+        const r = rotations[num-1];
+        dice.style.transform = `rotateX(${r[0]+720}deg) rotateY(${r[1]+720}deg)`;
+        
+        document.getElementById('dice-status').innerText = `掷骰子中...`;
+        
+        setTimeout(() => {
+            currentPos = (currentPos + num) % 16;
+            renderBoard();
+            handleTileEvent();
+            isRolling = false;
+        }, 1000);
+    }
+
+    function handleTileEvent() {
+        if (currentPos === 0) { 
+            alert("回到起点，稍作休整！");
+            nextTurn(); 
+            return; 
+        }
+        if (landShares[currentPos]) {
+            openChallengeModal();
+        } else {
+            openSynthesisModal();
+        }
+    }
+
+    // --- 占地环节 ---
+    function openSynthesisModal() {
+        selectedTheme = "";
+        document.getElementById('user-input').value = "";
+        document.getElementById('syn-priv').checked = false;
+        document.querySelectorAll('#synthesis-modal .btn-theme').forEach(b => {
+            b.style.background = 'var(--paper)';
+            b.style.color = 'var(--ink)';
+        });
+        document.getElementById('synthesis-modal').style.display = 'flex';
+    }
+
+    function selectTheme(theme, btn) {
+        selectedTheme = theme;
+        document.querySelectorAll('#synthesis-modal .btn-theme').forEach(b => {
+            b.style.background = 'var(--paper)';
+            b.style.color = 'var(--ink)';
+        });
+        btn.style.background = 'var(--jade)';
+        btn.style.color = 'white';
+    }
+
+    function confirmSynthesis() {
+        const text = document.getElementById('user-input').value;
+        if (!selectedTheme || !text) return alert("请在空白处填写词语或短句，总结一下刚刚的发言！");
+        
+        const p = players[activePlayerIndex];
+        const extra = document.getElementById('syn-priv').checked ? 1 : 0;
+        
+        landShares[currentPos] = {
+            ownerId: p.id,
+            theme: selectedTheme,
+            content: text,
+            shares: { [p.id]: 1 + extra }
+        };
+        p.inventory.push({ theme: selectedTheme, text: text });
+        p.score += 1;
+        
+        playSfx('scoreup');
+        closeModal('synthesis-modal');
+        renderBoard();
+        nextTurn();
+    }
+
+    // --- 对抗环节 ---
+    function openChallengeModal() {
+        const land = landShares[currentPos];
+        const owner = players[land.ownerId];
+        const challenger = players[activePlayerIndex];
+
+        selectedStrategy = "";
+        document.querySelectorAll('.btn-strategy').forEach(b => {
+            b.style.background = '#f9f9f9';
+            b.style.color = 'var(--ink)';
+        });
+        document.getElementById('chal-priv').checked = false;
+
+        renderPocket('challenger-pocket', challenger, "🚀 挑战者锦囊");
+        renderPocket('owner-pocket', owner, "🏰 领主锦囊");
+
+        document.getElementById('challenge-info').innerHTML = `
+            <div style="font-size: 14px; color: #666; margin-bottom: 5px;">📍 领地议题：<strong>${land.theme}</strong></div>
+            <div style="font-size: 14px; color: #666;">领主核心观点：</div>
+            <div style="margin:8px 0; padding:12px; background:${owner.color.light}; border-left:6px solid ${owner.color.main}; font-size: 20px; font-weight: bold;">
+                "${land.content}"
+            </div>
+            <div style="font-size: 14px; color: #888;">领主防御值：<strong>${land.shares[land.ownerId]} 股</strong></div>
+        `;
+        document.getElementById('challenge-modal').style.display = 'flex';
+    }
+
+    function renderPocket(id, player, title) {
+        const box = document.getElementById(id);
+        const tags = player.inventory.map(inv => `<span class="inv-tag" style="background:${player.color.main}">${inv.text.substring(0,8)}</span>`).join('');
+        box.innerHTML = `<div style="font-weight:bold; font-size:18px; color:${player.color.main}; border-bottom:2px solid ${player.color.light}; margin-bottom:10px; padding-bottom:5px;">${title}</div>` + 
+                        (tags || "<span style='color:#aaa; font-size: 14px;'>暂未获取锦囊</span>");
+    }
+
+    function selectStrategy(strategy, btn) {
+        selectedStrategy = strategy;
+        document.querySelectorAll('.btn-strategy').forEach(b => {
+            b.style.background = '#f9f9f9';
+            b.style.color = 'var(--ink)';
+        });
+        btn.style.background = 'var(--ink)';
+        btn.style.color = 'white';
+    }
+
+    function handleChallenge(isSuccess) {
+        const p = players[activePlayerIndex];
+        const land = landShares[currentPos];
+
+        if (isSuccess && p.id !== land.ownerId && !selectedStrategy) {
+            return alert("请先选择一项突破策略！");
+        }
+
+        const extra = document.getElementById('chal-priv').checked ? 1 : 0;
+        
+        if (isSuccess) {
+            land.shares[p.id] = (land.shares[p.id] || 0) + 1 + extra;
+            
+            // 易主判定
+            if (land.shares[p.id] > land.shares[land.ownerId]) {
+                land.ownerId = p.id;
+                playSfx('exchange'); // 篡位音效
+            } else {
+                playSfx('scoreup');  // 普通得分/巩固音效
+            }
+        }
+        
+        closeModal('challenge-modal');
+        renderBoard();
+        nextTurn();
+    }
+
+    // --- UI渲染 ---
+    function renderBoard() {
+        const board = document.getElementById('board');
+        board.innerHTML = '';
+        for(let i=0; i<25; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            if (mapOrder.includes(i)) {
+                const idx = mapOrder.indexOf(i);
+                cell.id = `step-${idx}`;
+                if (idx === currentPos) cell.classList.add('active');
+                
+                if (idx === 0) {
+                    cell.innerHTML = '<div class="cell-icon">🚩</div><div style="font-size:12px; font-weight:bold;">起点</div>';
+                } else {
+                    const land = landShares[idx];
+                    if (land) {
+                        const owner = players[land.ownerId];
+                        cell.style.backgroundColor = owner.color.light;
+                        cell.style.border = `4px solid ${owner.color.main}`;
+                        cell.innerHTML = `<div class="cell-icon">🏰</div>`;
+                        cell.innerHTML += `<div class="owner-banner" style="background:${owner.color.main}">${owner.name} (${land.shares[owner.id]}股)</div>`;
+                    } else {
+                        cell.innerHTML = '<div class="cell-icon" style="opacity:0.15;">⚖️</div>';
+                    }
+                }
+            } else { 
+                cell.style.visibility = 'hidden'; 
+            }
+            board.appendChild(cell);
+        }
+    }
+
+    function updateUI() {
+        const list = document.getElementById('player-list');
+        list.innerHTML = '';
+        players.forEach((p, i) => {
+            const active = i === activePlayerIndex ? 'active-player' : '';
+            const tags = p.inventory.map(inv => `<span class="inv-tag" style="background:${p.color.main}">${inv.text.substring(0,8)}</span>`).join('');
+            
+            list.innerHTML += `
+                <div class="score-item ${active}" style="border-left: 8px solid ${p.color.main}; border-color: ${i === activePlayerIndex ? p.color.main : '#ccc'};">
+                    <div style="display:flex; justify-content:space-between; font-weight:bold; font-size: 18px;">
+                        <span style="color:${p.color.main}">${p.name}</span>
+                        <span>${p.score} 分</span>
+                    </div>
+                    <div class="bag-title"> 手中锦囊：</div>
+                    <div style="margin-top: 5px;">${tags || '<span style="color:#aaa; font-size:12px;">暂无</span>'}</div>
+                </div>
+            `;
+        });
+        document.body.style.backgroundColor = players[activePlayerIndex].color.light;
+        document.getElementById('dice-status').innerHTML = `当前回合：<strong style="color:${players[activePlayerIndex].color.main}; font-size: 28px;">${players[activePlayerIndex].name}</strong>`;
+    }
+
+    function nextTurn() {
+        activePlayerIndex = (activePlayerIndex + 1) % players.length;
+        updateUI();
+    }
+
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+</script>
+</body>
+</html>
