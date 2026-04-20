@@ -328,6 +328,29 @@
     </div>
 </div>
 
+<div id="praise-modal" class="modal">
+    <div class="modal-content" style="border-color: #e492a1; background: #fffafb;">
+        <h2 style="color: #b52c46; font-size: 36px; margin-top:0;">🌸 夸夸奇遇 🌸</h2>
+        <div style="font-weight:bold; margin-bottom:15px; color:#666;">当前组：<span id="praise-player-name" style="color:var(--ink); font-size:20px;"></span></div>
+        
+        <p style="font-size: 20px; line-height: 1.6; color: #555; padding: 10px 20px;">
+            请大声说出备考期间，其他小组或同学身上让你敬佩、值得学习的闪光点！<br>
+            <span style="font-size: 16px; color: #e18899;">（可以夸奖他们的高效方法、良好心态、或是一次热心的帮助）</span>
+        </p>
+        
+        <div style="margin: 20px 0; padding: 20px; background: white; border: 2px dashed #ff8fa3;">
+            <h3 style="margin-top:0; color:#d0445d;">🎯 邀请被夸奖的小组打分：</h3>
+            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                <button class="btn-retro" style="background:#ffe1e8; color:#e492a1;" onclick="awardPraiseScore(1)">🥉 1分 (略显羞涩，但很开心)</button>
+                <button class="btn-retro" style="background:#ffb3c6; color:#a20021;" onclick="awardPraiseScore(2)">🥈 2分 (说到心坎里了！)</button>
+                <button class="btn-retro" style="background:#d0445d; color:white;" onclick="awardPraiseScore(3)">🥇 3分 (眼光也太好了吧！)</button>
+            </div>
+        </div>
+        
+        <button class="btn-retro" onclick="closeAllModals(); nextTurn();" style="color: #999;">放弃机会 (跳过)</button>
+    </div>
+</div>
+
 <script>
     let isMusicOn = true, isSfxOn = true;
     let musicVol = 0.5; 
@@ -412,10 +435,16 @@
             showFloatingText(activePlayerIndex, "+1", p.color.m);
             updateUI();
             showInfoModal('🚩 回到起点', `${p.name} 回到起点，并获得了一分！`, function() {
-            nextTurn();
-        });
-        return;
-    }
+            nextTurn(); });
+            return;
+        }
+
+        if(currentPos === 8) {
+            document.getElementById('praise-player-name').innerText = p.name;
+            document.getElementById('praise-modal').style.display = 'flex';
+            playSfx('exchange');
+            return; 
+        }
 
         if(landShares[currentPos]) {
             const land = landShares[currentPos];
@@ -583,15 +612,23 @@
             const cell = document.createElement('div'); cell.className = 'cell';
             if(mapOrder.includes(i)) {
                 if(i === realCurrentPos) cell.classList.add('active');
-                if(i === 0) cell.innerHTML = '🚩<br>起点';
-                else {
+                if(i === 0) {
+                    cell.innerHTML = '🚩<br>起点';
+                } else {
                     const logicIdx = mapOrder.indexOf(i);
-                    const land = landShares[logicIdx];
-                    if(land) {
-                        const owner = players[land.ownerId];
-                        cell.style.background = owner.color.l; cell.style.border = `3px solid ${owner.color.m}`;
-                        cell.innerHTML = `🏰<div class="owner-banner" style="background:${owner.color.m}">${owner.name} (${land.shares[owner.id]}股)</div>`;
-                    } else cell.innerHTML = '<span style="opacity:0.2">⚖️</span>';
+
+                    if(logicIdx === 8) {
+                        cell.style.background = '#fff0f3';
+                        cell.style.border = '3px dashed #d0445d';
+                        cell.innerHTML = '<span style="font-size:28px">🌸</span><br><b style="color:#d0445d; font-size:14px;">夸夸奇遇</b>';
+                    } else {
+                        const land = landShares[logicIdx];
+                        if(land) {
+                            const owner = players[land.ownerId];
+                            cell.style.background = owner.color.l; cell.style.border = `3px solid ${owner.color.m}`;
+                            cell.innerHTML = `🏰<div class="owner-banner" style="background:${owner.color.m}">${owner.name} (${land.shares[owner.id]}股)</div>`;
+                        } else cell.innerHTML = '<span style="opacity:0.2">⚖️</span>';
+                    }
                 }
             } else cell.style.visibility = 'hidden';
             board.appendChild(cell);
@@ -693,6 +730,19 @@
             panel.classList.remove('active');
             window.removeEventListener('click', closePanelOnClickOutside);
         }
+    }
+
+    function awardPraiseScore(points) {
+        const p = players[activePlayerIndex];
+        p.score += points;
+        
+        showFloatingText(activePlayerIndex, "+" + points, p.color.m);
+        playSfx('scoreup');
+        
+        closeAllModals();
+        renderBoard();
+        updateUI(); 
+        nextTurn();
     }
 </script>
 </body>
