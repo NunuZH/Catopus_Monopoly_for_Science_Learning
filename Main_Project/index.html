@@ -299,7 +299,7 @@
                 </div>
 
                 <div id="inquiry-judgment" style="display: none;">
-                    <button class="btn-retro btn-green" style="font-size: 22px; padding: 15px 20px; margin-right: 10px;" onclick="inquiryLordFails()">🟢 领主被问倒 (挑战者获得 +1 股)</button>
+                    <button class="btn-retro btn-green" style="font-size: 22px; padding: 15px 20px; margin-right: 10px;" onclick="inquiryLordFails()">🟢 挑战者获胜 (挑战者获得 +1 股)</button>
                     <button class="btn-retro btn-blue" style="font-size: 22px; padding: 15px 20px; margin-right: 10px;" onclick="defendSuccess()">🛡️ 领主完美防守 (领主获得 +1 股)</button>
                     <button class="btn-retro btn-gray" style="font-size: 18px; padding: 15px 20px;" onclick="submitChallenge(false)">取消 / 废题</button>
                 </div>
@@ -331,7 +331,7 @@
             <b style="color: var(--vermilion);">📝 老师们请注意：</b><br>
             1. <b>数量要求：</b>全地图共有 15 个探索点，请确保总卡片数量<b>至少为 15 张</b>。<br>
             2. <b>不足处理：</b>如果内容不够，可以将优质卡片复制多份。<br>
-            3. <b>抽取规则：</b>学生拾取卡片的机会有限，仅为 15 次。如果您的卡片库<b>大于 15 张</b>，部分卡片在该局将不会出现。<br>
+            3. <b>抽取规则：</b>学生拾取卡片的机会有限，仅为 15 次。如果您的卡片库<b>大于 15 张</b>，部分卡片在该局将无法被学生拾取。<br>
             4. <b>格式：</b>从 Excel 复制【类型(theory/experiment/phenomenon)、标题、描述】三列数据，粘贴在下面的方框，点击“确认生成”即可。
         </div>
 
@@ -366,7 +366,6 @@
 </div>
 
 <script>
-    // 人物图鉴  //
     const characters = [
         { id: 'c1', name: '孙岫云', img: '../Images/孙岫云.png', desc: '【特权】游戏任意阶段提出有效问题，可获得 1 分。<br>【特权】占领空地时，大胆的脑洞或富有创意的假设，可获额外股份。' },
         { id: 'c2', name: '李晞棠', img: '../Images/李晞棠.png', desc: '【特权】游戏任意阶段提出有效问题，可获得 1 分。<br>【特权】占领空地时，流畅精准或浪漫诗意的表达，可获额外股份。' },
@@ -375,19 +374,18 @@
         { id: 'c5', name: '卡尔', img: '../Images/卡尔.png', desc: '【特权】探索阶段时，即使回答错误，也能获得卡牌。<br>【特权】踢馆时，选择“极限挑刺”策略并成功时，可获额外股份。' },
         { id: 'c6', name: '章鱼猫', img: '../Images/章鱼猫.png', desc: '【特权】同行评议阶段，只要参与发言就能获得 1 分。<br>【特权】踢馆时，选择“现象拆解”策略并成功时，可获额外股份。' }
     ];
-    //换行用<br>
-    let currentSelectingIndex = 0; // 当前正在选人的队伍索引
-    let tempSelectedChar = null;   // 当前队伍点击暂选的人物
+    
+    let currentSelectingIndex = 0; 
+    let tempSelectedChar = null; 
 
-    // 音频管理系统 //
+    
     let isMusicOn = true;
     let isSfxOn = true;
 
-    // 1. 背景音乐设置 (循环播放)
+    
     const bgMusic = new Audio('../Audio/bg.mp3');
     bgMusic.loop = true;
 
-    // 2. 音效库
     const sfx = {
         click: new Audio('../Audio/click.mp3'),
         dice: new Audio('../Audio/dice.mp3'),
@@ -396,15 +394,13 @@
         exchange: new Audio('../Audio/exchange.mp3')
     };
 
-    // 播放音效的通用函数
     function playSfx(name) {
         if (isSfxOn && sfx[name]) {
-            sfx[name].currentTime = 0; // 允许连续快速点击发声
+            sfx[name].currentTime = 0; 
             sfx[name].play().catch(e => {}); 
         }
     }
 
-    // 切换音乐开关
     function toggleMusic() {
         isMusicOn = !isMusicOn;
         if (isMusicOn) bgMusic.play();
@@ -412,13 +408,11 @@
         document.getElementById('btn-music').innerText = isMusicOn ? "🎵 音乐：开" : "🎵 音乐：关";
     }
 
-    // 切换音效开关
     function toggleSfx() {
         isSfxOn = !isSfxOn;
         document.getElementById('btn-sfx').innerText = isSfxOn ? "🔊 音效：开" : "🔇 音效：关";
     }
 
-    // 全局点击音效：鼠标点屏幕任何地方都会触发
     document.addEventListener('click', function() {
         playSfx('click');
     });
@@ -474,7 +468,6 @@
     let pendingDrawnCard = null;
     let landShares = {}; 
 
-    // 新增：4 种踢馆策略的说明配置
     const challengeStrategies = {
         'connect': {
             title: '🔗 知识链接 (扩展与搭桥)',
@@ -485,8 +478,8 @@
             desc: '<strong>【动作指令】</strong><br>请指出领主手中任意理论或实验卡的<b>“理想条件”、“适用边界”或“最大误差来源”</b>。<br><br><span style="color:#666; font-size:18px;"><i>例：指出动量守恒定理必须在“系统不受外力”的绝对理想条件下才成立。</i></span>'
         },
         'inquiry': {
-            title: '❓ 灵魂拷问 (逆向提问)',
-            desc: '<strong>【动作指令】</strong><br>针对领主手中的任意卡牌、或卡牌组提出问题，并要求原领主现场作答！<br><br><div style="background:#eee; padding:10px; border-radius:5px; font-size:18px;"><b>⚔️ 胜负规则：</b><br>1. 若领主答错或弃权，<b>挑战者加 1 股，领主减 1 股</b>。<br>2. 若领主完美防守，<b>领主加 1 股</b>！</div>'
+            title: '❓ 灵魂拷问 (PK问答)',
+            desc: '<strong>【动作指令】</strong><br>主持人针对领主手中的任意卡牌、或卡牌组提出问题，邀请原领主与挑战者共同参与现场作答，回答完整度更高的一方获得胜利！<br><br><div style="background:#eee; padding:10px; border-radius:5px; font-size:18px;"><b>⚔️ 胜负规则：</b><br>1. 若挑战者在比试中获胜，<b>挑战者加 1 股，领主减 1 股</b>。<br>2. 若领主完美防守，<b>领主加 1 股</b>！</div>'
         },
         'deconstruct': {
             title: '🧩 现象拆解 (机制解码)',
@@ -499,34 +492,31 @@
         
         const num = document.getElementById('player-num').value;
         const colors = ['#8c2727', '#3d5a45', '#3c5a82', '#b58235', '#6b4226', '#4b0082'];
-        players = []; // 重置
+        players = []; 
         for(let i=0; i<num; i++) {
-            // 初始化时不带角色，等会选
             players.push({ id: i, name: `第${i+1}组`, color: colors[i], score: 0, inventory: { theory: [], experiment: [], phenomenon: [] }, character: null });
         }
         
         document.getElementById('setup').style.display = 'none';
         
-        // 核心修改：不直接进 main-stage，而是进入选人界面
         document.getElementById('character-select-stage').style.display = 'flex';
         currentSelectingIndex = 0;
         renderCharacterSelect();
     }
 
-    // 渲染选人界面
     function renderCharacterSelect() {
         const p = players[currentSelectingIndex];
         const teamNameEl = document.getElementById('selecting-team-name');
         teamNameEl.innerText = p.name;
         teamNameEl.style.color = p.color;
-        document.body.style.backgroundColor = p.color + "0A"; // 背景色呼应
+        document.body.style.backgroundColor = p.color + "0A"; 
 
         tempSelectedChar = null;
         const grid = document.getElementById('char-grid');
         grid.innerHTML = '';
 
         characters.forEach(char => {
-            // 检查这个角色是不是已经被前面的队伍选走了
+            
             const isTaken = players.some(player => player.character && player.character.id === char.id);
             const takenClass = isTaken ? 'disabled' : '';
             const takenText = isTaken ? '<div style="color:red; font-weight:bold; margin-top:5px;">[已出战]</div>' : '';
@@ -542,17 +532,15 @@
         });
     }
 
-    // 点击某个人物卡片
     function selectChar(charId) {
         if(typeof playSfx === 'function') playSfx('click');
-        // 移除所有高亮
+        
         document.querySelectorAll('.char-card').forEach(card => card.classList.remove('selected'));
-        // 给当前加高亮
+       
         document.getElementById(`char-card-${charId}`).classList.add('selected');
         tempSelectedChar = characters.find(c => c.id === charId);
     }
 
-    // 锁定身份，换下一组
     function confirmCharacter() {
         if (!tempSelectedChar) {
             alert("请先点击选择一位学者！");
@@ -563,14 +551,12 @@
         players[currentSelectingIndex].character = tempSelectedChar;
         currentSelectingIndex++;
 
-        // 如果所有组都选完了，正式进入游戏棋盘！
         if (currentSelectingIndex >= players.length) {
             document.getElementById('character-select-stage').style.display = 'none';
             document.getElementById('main-stage').style.display = 'flex';
             renderBoard();
             updateDiceStatus();
         } else {
-            // 没选完，刷新界面给下一组选
             renderCharacterSelect();
         }
     }
@@ -614,7 +600,7 @@
         centerStage.style.top = '50%';
         centerStage.style.left = '50%';
         centerStage.style.transform = 'translate(-50%, -50%)';
-        centerStage.style.pointerEvents = 'none'; // 鼠标穿透，防止挡住中间区域的点击
+        centerStage.style.pointerEvents = 'none'; 
         centerStage.style.display = 'flex';
         centerStage.style.flexDirection = 'column';
         centerStage.style.alignItems = 'center';
@@ -688,7 +674,6 @@
         document.getElementById(`step-${currentPos}`).classList.add('active');
     }
 
-    // 存档功能
     function saveGame() {
         try {
             const gameData = {
@@ -698,7 +683,6 @@
                 landShares: landShares,       
                 currentMapTypes: currentMapTypes,
                 cardPool: cardPool,
-                // 记录当前是否已经进入了游戏主舞台
                 isGameStarted: document.getElementById('main-stage').style.display === 'flex'
             };
             localStorage.setItem('game_save', JSON.stringify(gameData));
@@ -709,7 +693,6 @@
         }
     }
 
-    // 读档：增加更严谨的判断
     function loadGame() {
         const savedData = localStorage.getItem('game_save');
         if (!savedData) {
@@ -720,7 +703,6 @@
         try {
             const data = JSON.parse(savedData);
             
-            // 强制覆盖全局变量 (确保你顶部的变量是用 let 定义的)
             players = data.players;
             activePlayerIndex = data.activePlayerIndex;
             currentPos = data.currentPos;
@@ -728,17 +710,14 @@
             currentMapTypes = data.currentMapTypes;
             cardPool = data.cardPool;
 
-            // 解锁骰子状态
             isDiceRolling = false;
 
-            // 如果存档时已经在游戏中，则强制切换界面
             if (data.isGameStarted) {
                 document.getElementById('setup').style.display = 'none';
                 document.getElementById('character-select-stage').style.display = 'none';
                 document.getElementById('main-stage').style.display = 'flex';
             }
 
-            // 彻底刷新页面元素
             renderBoard();       
             updateScoreBoard();  
             updateDiceStatus();  
@@ -888,13 +867,12 @@
         modal.style.backgroundColor = p.color + "E6"; 
         document.getElementById('synthesis-title').innerHTML = `⚖️ <span style="color:${p.color}">${p.name}</span> 申请初次占地`;
         
-        // 【关键修复】确保这里是空数组，而不是 null
         synthSelection = { phenomenon: [], theory: [], experiment: [] }; 
         
         const renderCol = (type, colId) => {
             const col = document.getElementById(colId);
             const title = col.innerHTML.split('</h3>')[0] + '</h3>';
-            // 这里的 type 必须是 phenomenon, theory, experiment 全称
+
             let inventoryKey = type === 'syn-pheno' ? 'phenomenon' : (type === 'syn-theory' ? 'theory' : 'experiment');
             
             let content = p.inventory[type].map((c, idx) => { 
@@ -909,8 +887,7 @@
         renderCol('phenomenon', 'syn-pheno'); 
         renderCol('theory', 'syn-theory'); 
         renderCol('experiment', 'syn-exp');
-
-        // ... 下面特权区逻辑保持不变 ...
+        
         modal.style.display = 'flex';
     }
 
@@ -939,9 +916,7 @@
         try {
             p.score += 1;
 
-            // --- 批量标记 used 的鲁棒性逻辑 ---
             for (let type in synthSelection) {
-                // 兼容可能出现的简写
                 let realType = type;
                 if (type === 'pheno' || type === 'syn-pheno') realType = 'phenomenon';
                 if (type === 'exp' || type === 'syn-exp') realType = 'experiment';
@@ -949,7 +924,7 @@
                 if (Array.isArray(synthSelection[type]) && p.inventory[realType]) {
                     synthSelection[type].forEach(idx => {
                         if (p.inventory[realType][idx]) {
-                            p.inventory[realType][idx].used = true; // 变灰逻辑回归
+                            p.inventory[realType][idx].used = true; 
                         }
                     });
                 }
@@ -966,20 +941,17 @@
             document.getElementById('synthesis-modal').style.display = 'none';
             showScoreAnimation(p.color, 1);
             
-            // 【关键重置】
             synthSelection = { phenomenon: [], theory: [], experiment: [] };
             alert(`🎉 占地成功！【${p.name}】成为了领主。`);
             nextTurn();
 
         } catch (e) {
             console.error("结算出错:", e);
-            // 如果出错，至少要把窗口关了，防止界面卡死
             document.getElementById('synthesis-modal').style.display = 'none';
             nextTurn();
         }
     }
-
-    // ================== 核心升级：踢馆与巩固系统 (加入策略选择) ================== //
+    
     function openChallengeModal() {
         const p = players[activePlayerIndex];
         const ls = landShares[currentPos];
@@ -1001,7 +973,6 @@
             </div>
         `;
 
-        // 每次打开，确保先显示策略选择区，隐藏执行区
         document.getElementById('challenge-strategy-selection').style.display = 'block';
         document.getElementById('challenge-strategy-execution').style.display = 'none';
 
@@ -1010,9 +981,9 @@
         modal.style.display = 'flex';
     }
 
-    // 点击某一个策略按钮
+  
     function selectStrategy(type) {
-        // 隐藏选择区，显示说明和打分按钮
+    
         document.getElementById('challenge-strategy-selection').style.display = 'none';
         document.getElementById('challenge-strategy-execution').style.display = 'block';
         
@@ -1022,7 +993,6 @@
             ${strategy.desc}
         `;
         
-        // 如果是灵魂拷问，显示对抗按钮；否则显示普通按钮
         if (type === 'inquiry') {
             document.getElementById('standard-judgment').style.display = 'none';
             document.getElementById('inquiry-judgment').style.display = 'block';
@@ -1030,7 +1000,7 @@
             document.getElementById('standard-judgment').style.display = 'block';
             document.getElementById('inquiry-judgment').style.display = 'none';
         }
-        // 👉 智能识别：根据“角色”+“策略”的组合，生成相应的特权框
+       
         const p = players[activePlayerIndex];
         const privZone = document.getElementById('challenge-privilege-zone');
         privZone.innerHTML = ''; 
@@ -1040,10 +1010,10 @@
             if (p.character.id === 'c1') { canCheck = true; privText = '大胆脑洞 / 创意假设'; } 
             else if (p.character.id === 'c2') { canCheck = true; privText = '流畅精准 / 浪漫诗意'; } 
             else if (p.character.id === 'c3' && type === 'connect') {
-                // 钱澈的特殊文字提醒（不给股，但破除规则）
+               
                 privZone.innerHTML = `<div style="color: var(--jade); background:#fffcf5; padding:10px; border:2px dashed var(--jade); border-radius:5px;">🌟 <b>【钱澈】特权已触发：</b><br>当前策略允许跨组使用全场任意已揭晓的卡牌！（无额外股份）</div>`;
             } 
-            else if (p.character.id === 'c4' && type === 'inquiry') { canCheck = true; privText = '成功完成灵魂拷问'; } 
+            else if (p.character.id === 'c4' && type === 'inquiry') { canCheck = true; privText = '挑战者在灵魂拷问中获胜'; } 
             else if (p.character.id === 'c5' && type === 'boundary') { canCheck = true; privText = '成功完成极限挑刺'; } 
             else if (p.character.id === 'c6' && type === 'deconstruct') { canCheck = true; privText = '成功完成现象拆解'; }
             
@@ -1058,7 +1028,6 @@
         document.getElementById('challenge-strategy-execution').style.display = 'none';
     }
 
-    // 专属于灵魂拷问的：领主防守成功
     function defendSuccess() {
         const ls = landShares[currentPos];
         const ownerId = ls.ownerId;
@@ -1101,16 +1070,15 @@
         nextTurn();
     }
 
-    // 灵魂拷问：领主被问倒（惩罚领主扣 1 股）
+   
     function inquiryLordFails() {
-        const p = players[activePlayerIndex]; // 当前挑战者
+        const p = players[activePlayerIndex]; 
         const ls = landShares[currentPos];
         const ownerId = ls.ownerId;
         const owner = players.find(player => player.id === ownerId);
         
-        // 1. 领主扣除 1 股 (最低扣到 0)
         ls.players[ownerId] = Math.max(0, (ls.players[ownerId] || 0) - 1);    
-        // 飘个 -1 的动画吓唬他一下
+       
         showScoreAnimation(owner.color, -1);
 
         let extraShare = 0;
@@ -1118,32 +1086,29 @@
         if (privCheck && privCheck.checked) extraShare = 1;
 
         ls.players[p.id] = (ls.players[p.id] || 0) + 1 + extraShare;
-        // 给挑战者飘个加分动画
+        
         showScoreAnimation(p.color, 1);
         let msgBonus = extraShare > 0 ? ` 且触发特权额外再加1股！` : ``;
         showScoreAnimation(p.color, 1);
 
-        let alertMsg = `🔴 灵魂拷问成功！\n领主【${owner.name}】被问倒，惨遭扣除 1 股！(剩余 ${ls.players[ownerId]} 股)`;
-
-        // 2. 检查是否因为领主掉股，导致挑战者的股份反超，直接篡位！
+        let alertMsg = `🔴 恭喜挑战者在灵魂拷问中获胜！\n领主【${owner.name}】被问倒，惨遭扣除 1 股！(剩余 ${ls.players[ownerId]} 股)`;
+       
         let maxShare = 0;
         let newOwnerId = ownerId;
-        // 找出当前股份最高的人
+       
         for (let pid in ls.players) {
             if (ls.players[pid] > maxShare) {
                 maxShare = ls.players[pid];
                 newOwnerId = parseInt(pid);
             }
         }
-        
-        // 如果最高的人变了，而且刚好是当前的挑战者
+
         if (newOwnerId !== ownerId && newOwnerId === p.id) {
             ls.ownerId = newOwnerId;
             alertMsg += `\n\n🎊 领主跌落神坛！【${p.name}】顺势上位，夺取了此地控制权！`;
-            if (typeof playSfx === 'function') playSfx('exchange'); // 播放篡位音效
+            if (typeof playSfx === 'function') playSfx('exchange'); 
         }
 
-        // 3. 更新界面
         renderBoard();
         updateScoreBoard();
         alert(alertMsg);
@@ -1167,18 +1132,17 @@
         updateDiceStatus(); 
     }
 
-    // 切换弹窗显示/隐藏
+   
     function toggleDevModal(show) {
         const modal = document.getElementById('dev-modal');
         modal.style.display = show ? 'flex' : 'none';
-        // 每次打开时清空一下输入框，防止误操作
+       
         if(show) {
             document.getElementById('excel-input').value = '';
             document.getElementById('output-area').style.display = 'none';
         }
     }
 
-    // 修改后的炼金逻辑：增加自动关闭弹窗
     function convertExcelToJSON() {
         const input = document.getElementById('excel-input').value.trim();
         if (!input) return alert("空空的，生成不出东西哦！");
@@ -1209,20 +1173,18 @@
                 newPool.theory.push({ id: 't' + (newPool.theory.length + 1), name: "待开发", desc: "等待后续开发中..." });
             }
         }
-        cardPool = newPool; // 实装数据
-        saveGame(); // 自动存档
+        cardPool = newPool; 
+        saveGame(); 
         alert(`✨ 解码成功！已识别 ${total} 张新卡片并自动存档。\n\n【重要提示】请点击右上角“读档”或刷新后读档，新卡片即可生效！`);
     }
     function openStrategyModal() {
-        const challenger = players[activePlayerIndex]; // 挑战者（当前走到的玩家）
-        const ownerInfo = landShares[currentPos]; // 获取当前格子领主信息
+        const challenger = players[activePlayerIndex]; 
+        const ownerInfo = landShares[currentPos]; 
         
-        // 如果这地方没领主，可能就不叫“挑战”了，这里我们假设已经判断过有领主了
         if (!ownerInfo) return alert("这里还没有领主，无需对垒！");
         
-        const defender = players.find(p => p.id === ownerInfo.ownerId); // 找到领主本人
+        const defender = players.find(p => p.id === ownerInfo.ownerId); 
 
-        // 设置名字和颜色
         const cName = document.getElementById('challenger-name');
         cName.innerText = `🚀 挑战者：${challenger.name}`;
         cName.style.color = challenger.color;
@@ -1233,16 +1195,13 @@
         dName.style.color = defender.color;
         dName.style.borderColor = defender.color;
 
-        // 渲染函数
         const renderToZone = (player, containerId) => {
             const container = document.getElementById(containerId);
             let html = "";
             
-            // 遍历三类卡片
             ['phenomenon', 'theory', 'experiment'].forEach(type => {
                 player.inventory[type].forEach((c, idx) => {
                     const usedClass = c.used ? 'used-card' : '';
-                    // 只保留卡片名称，去掉 label 和描述
                     html += `
                         <div class="synth-item ${usedClass}" 
                             style="margin-bottom:6px; padding:8px 12px; cursor:pointer;" 
