@@ -538,45 +538,47 @@
         updateScoreBoard();
     }
 
-    function distributeRemainingLands() {
-        let emptyLands = [];
-        
-        for (let i = 0; i < mapOrder.length; i++) {
-            let pos = mapOrder[i];
-            if (underlyingMapTypes[pos] === 'synthesis' && !landShares[pos]) {
-                emptyLands.push(pos);
-            }
-        }
+    function distributeRemainingCards() {
+        let allCards = [];
+        ['theory', 'experiment', 'phenomenon'].forEach(type => {
+            cardPool[type].forEach(card => {
+                card.type = type; 
+                allCards.push(card);
+            });
+            cardPool[type] = []; 
+        });
 
-        if (emptyLands.length === 0) {
-            alert("场上所有空地都已经被占领啦，直接进入踢馆阶段！");
+        if (allCards.length === 0) {
+            alert("卡池已经空啦，没有可以分配的卡牌，直接进入下一阶段！");
         } else {
-            
-            emptyLands.sort(() => Math.random() - 0.5);
+           
+            allCards.sort(() => Math.random() - 0.5);
+            let startIndex = Math.floor(Math.random() * players.length); 
+            let results = players.map(p => ({ name: p.name, color: p.color, cards: [] }));
 
-            let results = players.map(p => ({ name: p.name, color: p.color, lands: [] }));
-            emptyLands.forEach((landPos, index) => {
-                let pIndex = index % players.length;
-                let p = players[pIndex];
-                
-                landShares[landPos] = { ownerId: p.id, players: {} };
-                landShares[landPos].players[p.id] = 1;
-                p.score += 1; 
-
-                results[pIndex].lands.push(`${landPos}号地`);
+            allCards.forEach((card, index) => {
+                let pIndex = (startIndex + index) % players.length; 
+                players[pIndex].inventory[card.type].push(card);
+                results[pIndex].cards.push(`[${card.name}]`);
             });
 
-            let msg = "<h3 style='margin-top:0; color:var(--vermilion);'>🏰 第二阶段结束：剩余领地已自动分发！</h3>";
+            let msg = "<h3 style='margin-top:0; color:var(--vermilion);'>🎉 第一阶段结束：卡牌已自动分发！</h3>";
             results.forEach(r => {
-                let landList = r.lands.length > 0 ? r.lands.join('、') : '<span style="color:#999;">无</span>';
-                msg += `<div><strong style="color:${r.color}; font-size:22px;">${r.name}</strong> 分配到了: <b>${landList}</b> (各+1分)</div><hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">`;
+                let cardList = r.cards.length > 0 ? r.cards.join(' ') : '<span style="color:#999;">无</span>';
+                msg += `<div><strong style="color:${r.color}; font-size:22px;">${r.name}</strong> 获得了 ${r.cards.length} 张卡: <br><span style="font-size:16px;">${cardList}</span></div><hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">`;
             });
             
             document.getElementById('announcement-content').innerHTML = msg;
             document.getElementById('announcement-modal').style.display = 'flex';
-            if(typeof playSfx === 'function') playSfx('scoreup');
+            if(typeof playSfx === 'function') playSfx('cheer'); 
         }
 
+        for (let i = 0; i < currentMapTypes.length; i++) {
+            if (currentMapTypes[i] === 'resource') {
+                currentMapTypes[i] = underlyingMapTypes[i];
+            }
+        }
+        
         renderBoard();
         updateScoreBoard();
     }
