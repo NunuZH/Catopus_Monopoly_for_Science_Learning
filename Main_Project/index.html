@@ -174,6 +174,7 @@
         <button class="btn-retro" style="font-size: 14px; padding: 5px 10px;" onclick="saveGame()">🏮 存档</button>
         <button class="btn-retro" style="font-size: 14px; padding: 5px 10px;" onclick="loadGame()">🕯️ 读档</button>
         <button class="btn-retro" style="font-size: 14px; padding: 5px 10px;" onclick="toggleDevModal(true)">⚙️ 自定义</button>
+        <button class="btn-retro" style="font-size: 14px; padding: 5px 10px; background: var(--vermilion); color: white;" onclick="advanceStage()">⏩ 推进阶段</button>
     </div>
     🎋 学术游园会 🎋
     <div style="position: absolute; top: 15px; right: 0px; z-index: 100;">
@@ -318,6 +319,15 @@
         <h3 style="font-size: 36px;">全员抢答准备！</h3>
         <p style="font-size: 24px;">请老师展示评议题目，最先回答正确的小组将获得额外加分！</p>
         <button class="btn-retro btn-green" style="font-size: 26px; padding: 20px 50px; margin-top: 30px;" onclick="closePeerReview()">评议结束</button>
+    </div>
+</div>
+
+<div id="announcement-modal" class="modal" style="z-index: 10005;">
+    <div class="modal-content" style="border-color: var(--ochre); max-width: 800px;">
+        <h2 style="color: var(--ochre); font-size: 36px; margin-top: 0;">📜 阶段结算公告</h2>
+        <div id="announcement-content" style="font-size: 20px; text-align: left; line-height: 1.8; background: #fffcf5; padding: 25px; border: 2px dashed var(--ink); margin-bottom: 25px;">
+            </div>
+        <button class="btn-retro btn-green" style="font-size: 22px; padding: 12px 40px;" onclick="document.getElementById('announcement-modal').style.display='none'">确认并继续</button>
     </div>
 </div>
 
@@ -468,6 +478,109 @@
     let pendingDrawnCard = null;
     let landShares = {}; 
 
+    let currentGlobalStage = 1;
+
+    function advanceStage() {
+        if (currentGlobalStage === 1) {
+            if (!confirm("确定要结束【探索抽牌】阶段吗？\n剩余卡牌将平分给各组，并开启所有地形进入【占地阶段】！")) return;
+            distributeRemainingCards();
+            currentGlobalStage = 2;
+        } else if (currentGlobalStage === 2) {
+            if (!confirm("确定要结束【自由占地】阶段吗？\n剩余空地将平分给各组，进入【全面踢馆】阶段！")) return;
+            distributeRemainingLands();
+            currentGlobalStage = 3;
+        } else {
+            alert("目前已经是最终阶段（全面踢馆）啦！");
+        }
+    }
+
+    function distributeRemainingCards() {
+        let allCards = [];
+        ['theory', 'experiment', 'phenomenon'].forEach(type => {
+            cardPool[type].forEach(card => {
+                card.type = type; 
+                allCards.push(card);
+            });
+            cardPool[type] = []; 
+        });
+
+        if (allCards.length === 0) {
+            alert("卡池已经空啦，没有可以分配的卡牌，直接进入下一阶段！");
+        } else {
+            allCards.sort(() => Math.random() - 0.5);
+
+            let startIndex = Math.floor(Math.random() * players.length); 
+            
+            allCards.forEach((card, index) => {
+                let pIndex = (startIndex + index) % players.length; 
+                players[pIndex].inventory[card.type].push(card);
+                results[pIndex].cards.push(`[${card.name}]`);
+            });
+
+            let msg = "<h3 style='margin-top:0; color:var(--vermilion);'>🎉 第一阶段结束：卡牌已自动分发！</h3>";
+            results.forEach(r => {
+                let cardList = r.cards.length > 0 ? r.cards.join(' ') : '<span style="color:#999;">无</span>';
+                msg += `<div><strong style="color:${r.color}; font-size:22px;">${r.name}</strong> 获得了 ${r.cards.length} 张卡: <br><span style="font-size:16px;">${cardList}</span></div><hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">`;
+            });
+            
+            document.getElementById('announcement-content').innerHTML = msg;
+            document.getElementById('announcement-modal').style.display = 'flex';
+            if(typeof playSfx === 'function') playSfx('cheer'); // 如果你有这个音效的话
+        }
+
+        for (let i = 0; i < currentMapTypes.length; i++) {
+            if (currentMapTypes[i] === 'resource') {
+                currentMapTypes[i] = underlyingMapTypes[i];
+            }
+        }
+        
+        renderBoard();
+        updateScoreBoard();
+    }
+
+    function distributeRemainingLands() {
+        let emptyLands = [];
+        
+        for (let i = 0; i < mapOrder.length; i++) {
+            let pos = mapOrder[i];
+            if (underlyingMapTypes[pos] === 'synthesis' && !landShares[pos]) {
+                emptyLands.push(pos);
+            }
+        }
+
+        if (emptyLands.length === 0) {
+            alert("场上所有空地都已经被占领啦，直接进入踢馆阶段！");
+        } else {
+            
+            emptyLands.sort(() => Math.random() - 0.5);
+
+            let results = players.map(p => ({ name: p.name, color: p.color, lands: [] }));
+            emptyLands.forEach((landPos, index) => {
+                let pIndex = index % players.length;
+                let p = players[pIndex];
+                
+                landShares[landPos] = { ownerId: p.id, players: {} };
+                landShares[landPos].players[p.id] = 1;
+                p.score += 1; 
+
+                results[pIndex].lands.push(`${landPos}号地`);
+            });
+
+            let msg = "<h3 style='margin-top:0; color:var(--vermilion);'>🏰 第二阶段结束：剩余领地已自动分发！</h3>";
+            results.forEach(r => {
+                let landList = r.lands.length > 0 ? r.lands.join('、') : '<span style="color:#999;">无</span>';
+                msg += `<div><strong style="color:${r.color}; font-size:22px;">${r.name}</strong> 分配到了: <b>${landList}</b> (各+1分)</div><hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">`;
+            });
+            
+            document.getElementById('announcement-content').innerHTML = msg;
+            document.getElementById('announcement-modal').style.display = 'flex';
+            if(typeof playSfx === 'function') playSfx('scoreup');
+        }
+
+        renderBoard();
+        updateScoreBoard();
+    }
+
     const challengeStrategies = {
         'connect': {
             title: '🔗 知识链接 (扩展与搭桥)',
@@ -479,7 +592,7 @@
         },
         'inquiry': {
             title: '❓ 灵魂拷问 (PK问答)',
-            desc: '<strong>【动作指令】</strong><br>主持人针对领主手中的任意卡牌、或卡牌组提出问题，邀请原领主与挑战者共同参与现场作答，回答完整度更高的一方获得胜利！<br><br><div style="background:#eee; padding:10px; border-radius:5px; font-size:18px;"><b>⚔️ 胜负规则：</b><br>1. 若挑战者在比试中获胜，<b>挑战者加 1 股，领主减 1 股</b>。<br>2. 若领主完美防守，<b>领主加 1 股</b>！</div>'
+            desc: '<strong>【动作指令】</strong><br>请主持人或任意另一组同学针对领主手中的任意卡牌、或卡牌组提出问题，邀请原领主与挑战者共同参与现场作答，回答完整度更高的一方获得胜利！<br><br><div style="background:#eee; padding:10px; border-radius:5px; font-size:18px;"><b>⚔️ 胜负规则：</b><br>1. 若挑战者在比试中获胜，<b>挑战者加 1 股，领主减 1 股</b>。<br>2. 若领主完美防守，<b>领主加 1 股</b>！</div>'
         },
         'deconstruct': {
             title: '🧩 现象拆解 (机制解码)',
